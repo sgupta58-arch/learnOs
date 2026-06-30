@@ -22,6 +22,8 @@ python-multipart = "^0.0.17"
 structlog = "^24.4.0"
 psycopg2-binary = "^2.9.10"
 email-validator = "^2.2.0"
+google-api-python-client = "^2.107.0"
+
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.0"
@@ -31,6 +33,7 @@ httpx = "^0.28.0"
 black = "^24.10.0"
 ruff = "^0.8.0"
 isort = "^5.13.0"
+google-api-python-client = "^2.198.0"
 
 [tool.poetry.scripts]
 learnos = "app.main:run"

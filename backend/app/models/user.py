@@ -1,5 +1,5 @@
 from sqlalchemy import Boolean, String
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database.base import BaseModel
 
@@ -19,3 +19,17 @@ class User(BaseModel):
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     is_verified: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     profile_picture: Mapped[str | None] = mapped_column(String(512), nullable=True)
+
+    # Relationships
+    playlists: Mapped[list["Playlist"]] = relationship(
+        "Playlist",
+        back_populates="user",
+        cascade="all, delete-orphan",
+        foreign_keys="Playlist.user_id",
+    )
+    video_progress: Mapped[list["VideoProgress"]] = relationship(
+        "VideoProgress",
+        back_populates="user",
+        cascade="all, delete-orphan",
+        foreign_keys="VideoProgress.user_id",
+    )

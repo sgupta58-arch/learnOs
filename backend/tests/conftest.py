@@ -1,10 +1,17 @@
 import os
+import sys
 from collections.abc import AsyncGenerator, Generator
+from pathlib import Path
 from unittest.mock import AsyncMock, patch
 
 import pytest
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
+
+# Ensure the backend directory is on sys.path so that `app` can be imported
+_backend_dir = str(Path(__file__).parent.parent)
+if _backend_dir not in sys.path:
+    sys.path.insert(0, _backend_dir)
 
 from app.core.config import Settings, get_settings
 from app.database.base import Base
@@ -141,3 +148,11 @@ async def integration_client(
 def mock_user_service() -> AsyncMock:
     """Provide a mocked UserService for API unit tests."""
     return AsyncMock(spec=UserService)
+
+
+@pytest.fixture
+def mock_playlist_service() -> AsyncMock:
+    """Provide a mocked PlaylistService for API unit tests."""
+    from app.services.playlist import PlaylistService
+
+    return AsyncMock(spec=PlaylistService)

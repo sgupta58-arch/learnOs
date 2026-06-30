@@ -2,6 +2,9 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.v1.users import router as users_router
+from app.api.v1.playlists import router as playlists_router
+from app.api.v1.videos import router as videos_router
+from app.api.v1.progress import router as progress_router
 from app.database.redis import check_redis_connection
 from app.database.session import check_database_connection, get_db
 from app.schemas.common import success_response
@@ -9,6 +12,9 @@ from app.schemas.common import success_response
 router = APIRouter()
 
 router.include_router(users_router)
+router.include_router(playlists_router)
+router.include_router(videos_router)
+router.include_router(progress_router)
 
 
 @router.get("/health")
