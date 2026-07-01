@@ -33,6 +33,8 @@ async def lifespan(app: FastAPI):
 def create_app(settings: Settings | None = None) -> FastAPI:
     """Application factory — creates and configures the FastAPI instance."""
     settings = settings or get_settings()
+    
+    print("Loaded CORS origins:", settings.CORS_ORIGINS)
 
     app = FastAPI(
         title=settings.APP_NAME,
