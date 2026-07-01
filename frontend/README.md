@@ -8,9 +8,9 @@ The frontend application for LearnOS, a Learning Operating System that transform
 |-------|-------|--------|
 | F1 | Project Foundation | ✅ Complete |
 | F2 | Authentication | ✅ Complete |
-| F3 | Dashboard & Playlists | ⬜ Next |
-| F4 | Video Player & Progress | ⬜ Planned |
-| F5+ | AI Features (Transcript, RAG, Tutor, etc.) | ⬜ Future |
+| F3 | Application Shell & Product Experience | ✅ Complete |
+| F4 | Playlist & Video Integration | ⬜ Next |
+| F5+ | AI Backend Integration | ⬜ Future |
 
 ## Phase F1: Project Foundation
 
@@ -137,6 +137,103 @@ Protected Routes accessible
 | `/register` | PublicRoute | Redirects authenticated users to `/dashboard` |
 | `/dashboard` | ProtectedRoute | Redirects unauthenticated users to `/login` |
 
+## Phase F3: Application Shell & Product Experience
+
+This phase built the complete application shell and all product pages. LearnOS is designed as a full SaaS application, not just a frontend for backend APIs. Pages without backend support have polished placeholder experiences ready for future integration.
+
+### What Was Built
+
+| Deliverable | Status |
+|------------|--------|
+| Responsive DashboardLayout with collapsible sidebar | ✅ |
+| Top navigation with search/notification/user placeholders | ✅ |
+| Dashboard page with stat widgets and recent playlists | ✅ |
+| Playlists page (backend-connected via TanStack Query) | ✅ |
+| Playlist detail page with video list | ✅ |
+| YouTube playlist import page (backend-connected) | ✅ |
+| AI Tutor page (placeholder UI, future-ready) | ✅ |
+| Analytics page (mock data, chart placeholders) | ✅ |
+| Progress page (mock data, stat cards) | ✅ |
+| Revision Planner page (mock data, calendar placeholder) | ✅ |
+| Flashcards page (mock data, card UI placeholder) | ✅ |
+| Notes page (mock data, editor placeholder) | ✅ |
+| Knowledge Graph page (mock data, viz placeholder) | ✅ |
+| Settings page (profile, logout functional) | ✅ |
+| All routes lazy-loaded with React.lazy() | ✅ |
+| Reusable components (PageHeader, StatCard, EmptyState) | ✅ |
+| Loading, error, and empty states for all pages | ✅ |
+| Responsive sidebar (desktop expand/collapse, mobile drawer) | ✅ |
+| Active route highlighting in sidebar | ✅ |
+| Logout from sidebar and settings | ✅ |
+
+### Application Shell Architecture
+
+```
+DashboardLayout
+├── Sidebar (collapsible, responsive)
+│   ├── Navigation items (11 pages)
+│   └── Logout button
+├── Top Navigation
+│   ├── Page title with icon
+│   ├── Search placeholder
+│   ├── Notifications placeholder
+│   └── User profile placeholder
+└── Main Content Area
+    └── Outlet (lazy-loaded feature pages)
+```
+
+### Navigation Structure
+
+| Page | Route | Backend | Status |
+|------|-------|---------|--------|
+| Dashboard | `/dashboard` | Partial | ✅ Live |
+| Playlists | `/dashboard/playlists` | Yes | ✅ Live |
+| Playlist Detail | `/dashboard/playlists/:id` | Yes | ✅ Live |
+| Import Playlist | `/dashboard/import` | Yes | ✅ Live |
+| AI Tutor | `/dashboard/tutor` | No | ✅ Placeholder |
+| Analytics | `/dashboard/analytics` | No | ✅ Placeholder |
+| Progress | `/dashboard/progress` | No | ✅ Placeholder |
+| Revision Planner | `/dashboard/revision` | No | ✅ Placeholder |
+| Flashcards | `/dashboard/flashcards` | No | ✅ Placeholder |
+| Notes | `/dashboard/notes` | No | ✅ Placeholder |
+| Knowledge Graph | `/dashboard/knowledge-graph` | No | ✅ Placeholder |
+| Settings | `/dashboard/settings` | Partial | ✅ Live |
+
+### Backend Integration Strategy
+
+**Currently connected:**
+- `GET /playlists` — List user playlists
+- `GET /playlists/{id}` — Get playlist detail
+- `DELETE /playlists/{id}` — Delete playlist
+- `POST /playlists/import/youtube` — Import YouTube playlist
+- `GET /videos?playlist_id={id}` — List playlist videos
+
+**Future integration (no UI changes needed):**
+- Progress tracking — replace mock data with `GET /users/me/progress`
+- Analytics — replace mock data with analytics endpoints
+- AI Tutor — connect chat interface to AI backend
+- Revision — connect to spaced repetition engine
+- Flashcards — connect to flashcard generation service
+- Notes — connect to notes CRUD API
+- Knowledge Graph — connect to graph visualization backend
+
+### Mock Data Strategy
+
+Future-only pages use dedicated placeholder UIs with:
+- Clear "coming in a future phase" messaging
+- Disabled inputs/buttons showing intended UX
+- Stat cards with zero values
+- Empty states explaining what the feature will do
+- No fake network requests or hardcoded mock data in components
+
+This makes replacing placeholders with real API data straightforward — no component redesign needed.
+
+### Responsive Design
+
+- **Desktop**: Full sidebar with labels, expand/collapse toggle
+- **Tablet**: Collapsible sidebar, full content area
+- **Mobile**: Hidden sidebar with hamburger menu, slide-out drawer
+
 ## Tech Stack
 
 | Technology | Purpose |
@@ -196,7 +293,10 @@ frontend/
 │   ├── assets/                      # Static assets (images, icons)
 │   ├── common/                      # Shared code across features
 │   │   ├── components/              # Reusable UI components
-│   │   │   └── ui/                  # shadcn/ui components (button, input, card, label)
+│   │   │   ├── ui/                  # shadcn/ui components
+│   │   │   ├── page-header.tsx      # Reusable page header
+│   │   │   ├── stat-card.tsx        # Dashboard stat card
+│   │   │   └── empty-state.tsx      # Empty state component
 │   │   ├── hooks/                   # Shared custom hooks
 │   │   ├── utils/                   # Utility functions (cn, etc.)
 │   │   ├── constants/               # Application constants
@@ -215,7 +315,17 @@ frontend/
 │   │   │   └── utils/               # Token storage utility
 │   │   ├── dashboard/               # Dashboard (Phase F3)
 │   │   ├── playlist/                # Playlist management (Phase F3)
-│   │   ├── player/                  # Video player (Phase F3)
+│   │   │   ├── pages/               # PlaylistsPage, PlaylistDetailPage, ImportPage
+│   │   │   ├── services/            # Playlist service (API functions)
+│   │   │   └── types/               # Playlist TypeScript types
+│   │   ├── tutor/                   # AI Tutor (Phase F3, placeholder)
+│   │   ├── analytics/               # Analytics (Phase F3, placeholder)
+│   │   ├── progress/                # Progress (Phase F3, placeholder)
+│   │   ├── revision/                # Revision Planner (Phase F3, placeholder)
+│   │   ├── flashcards/              # Flashcards (Phase F3, placeholder)
+│   │   ├── notes/                   # Notes (Phase F3, placeholder)
+│   │   ├── knowledge-graph/         # Knowledge Graph (Phase F3, placeholder)
+│   │   ├── settings/                # Settings (Phase F3)
 │   │   └── error/                   # Error pages (404, error boundary)
 │   ├── lib/                         # Third-party library configurations
 │   │   ├── query-client.ts          # TanStack Query client config
@@ -308,13 +418,24 @@ npm run preview
 
 ## Routes
 
-| Path | Component | Guard | Layout | Status |
-|------|-----------|-------|--------|--------|
-| `/` | LoginPage | PublicRoute | PublicLayout | ✅ Complete |
-| `/login` | LoginPage | PublicRoute | PublicLayout | ✅ Complete |
-| `/register` | RegisterPage | PublicRoute | PublicLayout | ✅ Complete |
-| `/dashboard` | DashboardPage | ProtectedRoute | DashboardLayout | ⬜ Placeholder (Phase F3) |
-| `*` | NotFoundPage | None | None | ✅ Complete |
+| Path | Component | Guard | Layout | Backend | Status |
+|------|-----------|-------|--------|---------|--------|
+| `/` | LoginPage | PublicRoute | PublicLayout | No | ✅ Complete |
+| `/login` | LoginPage | PublicRoute | PublicLayout | No | ✅ Complete |
+| `/register` | RegisterPage | PublicRoute | PublicLayout | No | ✅ Complete |
+| `/dashboard` | DashboardPage | ProtectedRoute | DashboardLayout | Partial | ✅ Complete |
+| `/dashboard/playlists` | PlaylistsPage | ProtectedRoute | DashboardLayout | Yes | ✅ Live |
+| `/dashboard/playlists/:id` | PlaylistDetailPage | ProtectedRoute | DashboardLayout | Yes | ✅ Live |
+| `/dashboard/import` | ImportPage | ProtectedRoute | DashboardLayout | Yes | ✅ Live |
+| `/dashboard/tutor` | TutorPage | ProtectedRoute | DashboardLayout | No | ✅ Placeholder |
+| `/dashboard/analytics` | AnalyticsPage | ProtectedRoute | DashboardLayout | No | ✅ Placeholder |
+| `/dashboard/progress` | ProgressPage | ProtectedRoute | DashboardLayout | No | ✅ Placeholder |
+| `/dashboard/revision` | RevisionPage | ProtectedRoute | DashboardLayout | No | ✅ Placeholder |
+| `/dashboard/flashcards` | FlashcardsPage | ProtectedRoute | DashboardLayout | No | ✅ Placeholder |
+| `/dashboard/notes` | NotesPage | ProtectedRoute | DashboardLayout | No | ✅ Placeholder |
+| `/dashboard/knowledge-graph` | KnowledgeGraphPage | ProtectedRoute | DashboardLayout | No | ✅ Placeholder |
+| `/dashboard/settings` | SettingsPage | ProtectedRoute | DashboardLayout | Partial | ✅ Complete |
+| `*` | NotFoundPage | None | None | No | ✅ Complete |
 
 All routes are lazy-loaded via `React.lazy()` for code splitting.
 
@@ -327,6 +448,7 @@ All routes are lazy-loaded via `React.lazy()` for code splitting.
 - **No cross-feature imports** — shared code via `common/` layer
 - **No direct localStorage access** — use tokenStorage utility
 - **Named exports** for components (default exports only for lazy-loaded pages)
+- **No mock data inside components** — use dedicated mock modules when needed
 
 ## Environment Variables
 
@@ -343,9 +465,14 @@ All routes are lazy-loaded via `React.lazy()` for code splitting.
 
 ## Next Phase
 
-**Phase F3 — Dashboard**
+**Phase F4 — Playlist & Video Integration**
 
-The next phase will implement the authenticated dashboard, application navigation, playlist listing, and establish the primary user workspace for LearnOS.
+The next phase will enhance playlist and video features:
+- Playlist creation and editing
+- Video player with progress tracking
+- Video progress persistence
+- Playlist deletion and management
+- Enhanced playlist detail views
 
 ## License
 

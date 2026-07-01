@@ -27,6 +27,72 @@ const DashboardPage = lazy(() =>
   })),
 );
 
+const PlaylistsPage = lazy(() =>
+  import('@/features/playlist/pages/playlists-page').then((m) => ({
+    default: m.PlaylistsPage,
+  })),
+);
+
+const PlaylistDetailPage = lazy(() =>
+  import('@/features/playlist/pages/playlist-detail-page').then((m) => ({
+    default: m.PlaylistDetailPage,
+  })),
+);
+
+const ImportPage = lazy(() =>
+  import('@/features/playlist/pages/import-page').then((m) => ({
+    default: m.ImportPage,
+  })),
+);
+
+const TutorPage = lazy(() =>
+  import('@/features/tutor/pages/tutor-page').then((m) => ({
+    default: m.TutorPage,
+  })),
+);
+
+const AnalyticsPage = lazy(() =>
+  import('@/features/analytics/pages/analytics-page').then((m) => ({
+    default: m.AnalyticsPage,
+  })),
+);
+
+const ProgressPage = lazy(() =>
+  import('@/features/progress/pages/progress-page').then((m) => ({
+    default: m.ProgressPage,
+  })),
+);
+
+const RevisionPage = lazy(() =>
+  import('@/features/revision/pages/revision-page').then((m) => ({
+    default: m.RevisionPage,
+  })),
+);
+
+const FlashcardsPage = lazy(() =>
+  import('@/features/flashcards/pages/flashcards-page').then((m) => ({
+    default: m.FlashcardsPage,
+  })),
+);
+
+const NotesPage = lazy(() =>
+  import('@/features/notes/pages/notes-page').then((m) => ({
+    default: m.NotesPage,
+  })),
+);
+
+const KnowledgeGraphPage = lazy(() =>
+  import('@/features/knowledge-graph/pages/knowledge-graph-page').then((m) => ({
+    default: m.KnowledgeGraphPage,
+  })),
+);
+
+const SettingsPage = lazy(() =>
+  import('@/features/settings/pages/settings-page').then((m) => ({
+    default: m.SettingsPage,
+  })),
+);
+
 const NotFoundPage = lazy(() =>
   import('@/features/error/pages/not-found-page').then((m) => ({
     default: m.NotFoundPage,
@@ -79,8 +145,52 @@ export const router = createBrowserRouter([
         errorElement: <ErrorPage />,
         children: [
           {
-            path: '/dashboard',
+            index: true,
             element: <DashboardPage />,
+          },
+          {
+            path: 'playlists',
+            element: <PlaylistsPage />,
+          },
+          {
+            path: 'playlists/:playlistId',
+            element: <PlaylistDetailPage />,
+          },
+          {
+            path: 'import',
+            element: <ImportPage />,
+          },
+          {
+            path: 'tutor',
+            element: <TutorPage />,
+          },
+          {
+            path: 'analytics',
+            element: <AnalyticsPage />,
+          },
+          {
+            path: 'progress',
+            element: <ProgressPage />,
+          },
+          {
+            path: 'revision',
+            element: <RevisionPage />,
+          },
+          {
+            path: 'flashcards',
+            element: <FlashcardsPage />,
+          },
+          {
+            path: 'notes',
+            element: <NotesPage />,
+          },
+          {
+            path: 'knowledge-graph',
+            element: <KnowledgeGraphPage />,
+          },
+          {
+            path: 'settings',
+            element: <SettingsPage />,
           },
         ],
       },
