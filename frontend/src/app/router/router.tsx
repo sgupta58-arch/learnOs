@@ -93,6 +93,12 @@ const SettingsPage = lazy(() =>
   })),
 );
 
+const WorkspacePage = lazy(() =>
+  import('@/features/learning/pages/workspace-page').then((m) => ({
+    default: m.WorkspacePage,
+  })),
+);
+
 const NotFoundPage = lazy(() =>
   import('@/features/error/pages/not-found-page').then((m) => ({
     default: m.NotFoundPage,
@@ -141,6 +147,7 @@ export const router = createBrowserRouter([
     element: <ProtectedRoute />,
     children: [
       {
+        path: 'dashboard',
         element: <DashboardLayout />,
         errorElement: <ErrorPage />,
         children: [
@@ -191,6 +198,10 @@ export const router = createBrowserRouter([
           {
             path: 'settings',
             element: <SettingsPage />,
+          },
+          {
+            path: 'workspace/:playlistId/:videoId',
+            element: <WorkspacePage />,
           },
         ],
       },

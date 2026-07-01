@@ -6,11 +6,11 @@ The frontend application for LearnOS, a Learning Operating System that transform
 
 | Phase | Focus | Status |
 |-------|-------|--------|
-| F1 | Project Foundation | ✅ Complete |
-| F2 | Authentication | ✅ Complete |
-| F3 | Application Shell & Product Experience | ✅ Complete |
-| F4 | Playlist & Video Integration | ⬜ Next |
-| F5+ | AI Backend Integration | ⬜ Future |
+| | F1 | Project Foundation | ✅ Complete |
+| | F2 | Authentication | ✅ Complete |
+| | F3 | Application Shell & Product Experience | ✅ Complete |
+| | F4 | Video Learning Experience | ✅ Complete |
+| | F5+ | AI Backend Integration | ⬜ Future |
 
 ## Phase F1: Project Foundation
 
@@ -137,6 +137,138 @@ Protected Routes accessible
 | `/register` | PublicRoute | Redirects authenticated users to `/dashboard` |
 | `/dashboard` | ProtectedRoute | Redirects unauthenticated users to `/login` |
 
+## Phase F5: Playlist Import & Learning Entry Flow
+
+This phase completes the first end-to-end learning workflow. Users can now import YouTube playlists and seamlessly transition from dashboard to learning workspace. This is the first point where LearnOS becomes a genuinely usable product.
+
+### What Was Built
+
+| Deliverable | Status |
+||------------|--------|
+| YouTube URL validation utility | ✅ |
+| Enhanced import page with success/error states | ✅ |
+| Real-time URL validation with inline feedback | ✅ |
+| Success state with "Start Learning" CTA | ✅ |
+| Playlist detail page with "Start Learning" banner | ✅ |
+| Dashboard integration (import CTA, playlist cards) | ✅ |
+| React Query invalidation after import | ✅ |
+| Automatic navigation after successful import | ✅ |
+| Empty state for new users | ✅ |
+| Continue Learning card (existing, enhanced) | ✅ |
+
+### Primary User Journey (MVP)
+
+```
+Register
+  ↓
+Login
+  ↓
+Dashboard
+  ↓
+Import Playlist
+  ↓
+Paste YouTube Playlist URL
+  ↓
+Validate URL (real-time)
+  ↓
+Import Playlist (API call)
+  ↓
+See Progress (loading state)
+  ↓
+Playlist Imported Successfully
+  ↓
+Open Playlist / Start Learning
+  ↓
+Learning Workspace
+  ↓
+Start Learning
+```
+
+### Import Flow Architecture
+
+```
+ImportPage
+├── URL Input with real-time validation
+│   ├── Validates YouTube domain
+│   ├── Extracts playlist ID
+│   └── Shows inline errors
+├── Import Button (disabled until valid)
+├── Loading State (spinner + "Importing...")
+├── Success State
+│   ├── Playlist title
+│   ├── Video count
+│   ├── "Start Learning" button
+│   ├── "View Playlist" button
+│   └── "Import Another" button
+└── Error State (user-friendly messages)
+```
+
+### Backend Integration
+
+**Import endpoint:**
+- `POST /playlists/import/youtube?source_url={url}`
+- Request: Query parameter with YouTube playlist URL
+- Response: `{ playlist_id, title, videos_imported }`
+- Authentication: JWT token required
+- Error handling: Invalid URL, private playlist, API failures
+
+**Query invalidation strategy:**
+- After successful import, invalidate `['playlists']` query
+- Invalidate `['continue-learning']` query
+- Dashboard automatically refreshes to show new playlist
+
+### URL Validation
+
+Supported formats:
+- `https://www.youtube.com/playlist?list=PLxxx`
+- `https://youtube.com/playlist?list=PLxxx`
+- `https://m.youtube.com/playlist?list=PLxxx`
+- `https://youtu.be/PLxxx`
+
+Validation rules:
+- Must be from youtube.com or youtu.be domain
+- Must contain `list` query parameter
+- Playlist ID must start with valid prefix (PL, OL, UU, FL, RD, LL)
+- Real-time validation as user types (after 10 characters)
+
+### Dashboard Integration
+
+**Empty state (no playlists):**
+- Shows "No playlists yet" message
+- Prominent "Import Your First Playlist" button
+- Helpful text explaining next steps
+
+**With playlists:**
+- Recent playlists section shows last 5 playlists
+- Each playlist is clickable (navigates to detail page)
+- Quick Actions card has "Import Playlist" as primary action
+- Continue Learning card shows resume options
+
+**Playlist detail page:**
+- "Start Learning" banner at top (if videos exist)
+- Shows first video title and duration
+- Prominent "Start Learning" button
+- Navigates to workspace with first video
+
+### Accessibility
+
+- All form inputs have associated labels
+- Error messages linked via `aria-describedby`
+- `aria-invalid` on inputs with errors
+- `role="alert"` on error messages
+- Keyboard navigation supported
+- Focus management after import
+
+### Engineering Rules Applied
+
+- ✅ No Axios calls from components (uses service layer)
+- ✅ No business logic in pages (extracted to hooks/services)
+- ✅ No `any` types (strict TypeScript)
+- ✅ No inline styles (Tailwind utility classes)
+- ✅ No cross-feature imports (shared code via `common/`)
+- ✅ Named exports for components
+- ✅ No mock data in components
+
 ## Phase F3: Application Shell & Product Experience
 
 This phase built the complete application shell and all product pages. LearnOS is designed as a full SaaS application, not just a frontend for backend APIs. Pages without backend support have polished placeholder experiences ready for future integration.
@@ -234,6 +366,173 @@ This makes replacing placeholders with real API data straightforward — no comp
 - **Tablet**: Collapsible sidebar, full content area
 - **Mobile**: Hidden sidebar with hamburger menu, slide-out drawer
 
+## Phase F4: Video Learning Experience
+
+This phase transforms LearnOS from a playlist manager into an actual learning platform. Users can now watch videos, track progress, take notes, and navigate playlists in a professional learning workspace.
+
+### What Was Built
+
+| Deliverable | Status |
+||------------|--------|
+| Learning feature structure (types, services, hooks, components, pages) | ✅ |
+| Video player with YouTube embed | ✅ |
+| Playlist sidebar with video navigation | ✅ |
+| Learning controls (previous/next, speed, autoplay) | ✅ |
+| Notes panel (UI only, backend future) | ✅ |
+| Resources panel (placeholder) | ✅ |
+| Continue Learning dashboard widget | ✅ |
+| Learning workspace page route | ✅ |
+| Keyboard shortcuts (space, Ctrl+arrows, Ctrl+B) | ✅ |
+| Responsive three-column layout | ✅ |
+| Progress indicators (not started, in progress, completed) | ✅ |
+| Video navigation from playlist detail | ✅ |
+
+### Learning Workspace Architecture
+
+```
+WorkspacePage
+├── Top Bar (playlist title, sidebar toggle, exit)
+├── Main Content
+│   ├── PlaylistSidebar (collapsible)
+│   │   ├── Playlist header (title, video count)
+│   │   └── Video list with progress indicators
+│   ├── Center Column
+│   │   ├── VideoPlayer (YouTube embed)
+│   │   └── LearningControls (navigation, speed, autoplay)
+│   └── Right Panel (desktop only)
+│       ├── Tabs (Overview, Transcript, Notes, Tutor, Resources)
+│       └── Tab Content
+│           ├── Overview (video details)
+│           ├── Notes (editor UI)
+│           ├── Resources (placeholder)
+│           ├── Transcript (placeholder)
+│           └── Tutor (placeholder)
+└── Keyboard Shortcuts
+    ├── Space: Play/Pause
+    ├── Ctrl+Right: Next video
+    ├── Ctrl+Left: Previous video
+    └── Ctrl+B: Toggle sidebar
+```
+
+### User Journey
+
+```
+Login
+  ↓
+Dashboard
+  ↓
+Continue Learning (resume video)
+  ↓
+Playlists
+  ↓
+Select Playlist
+  ↓
+Playlist Detail
+  ↓
+Click Play button
+  ↓
+Learning Workspace
+  ↓
+Watch Video
+  ↓
+Track Progress
+  ↓
+Next Video (autoplay)
+  ↓
+Continue Learning
+```
+
+### Backend Integration
+
+**Currently connected:**
+- Playlist/video fetching (via playlist service)
+- Continue learning data (via learning service)
+
+**Future integration:**
+- Video progress persistence
+- Notes CRUD
+- Transcript fetching
+- AI Tutor chat
+
+### Responsive Design
+
+- **Desktop (lg+)**: Three-column layout (sidebar + player + info panel)
+- **Tablet (md)**: Two-column layout (sidebar + player, info panel hidden)
+- **Mobile (sm)**: Single column with collapsible sidebar
+
+### Learning Workspace Architecture
+
+```
+WorkspacePage
+├── Top Bar (playlist title, sidebar toggle, exit)
+├── Main Content
+│   ├── PlaylistSidebar (collapsible)
+│   │   ├── Playlist header (title, video count)
+│   │   └── Video list with progress indicators
+│   ├── Center Column
+│   │   ├── VideoPlayer (YouTube embed)
+│   │   └── LearningControls (navigation, speed, autoplay)
+│   └── Right Panel (desktop only)
+│       ├── Tabs (Overview, Transcript, Notes, Tutor, Resources)
+│       └── Tab Content
+│           ├── Overview (video details)
+│           ├── Notes (editor UI)
+│           ├── Resources (placeholder)
+│           ├── Transcript (placeholder)
+│           └── Tutor (placeholder)
+└── Keyboard Shortcuts
+    ├── Space: Play/Pause
+    ├── Ctrl+Right: Next video
+    ├── Ctrl+Left: Previous video
+    └── Ctrl+B: Toggle sidebar
+```
+
+### User Journey
+
+```
+Login
+  ↓
+Dashboard
+  ↓
+Continue Learning (resume video)
+  ↓
+Playlists
+  ↓
+Select Playlist
+  ↓
+Playlist Detail
+  ↓
+Click Play button
+  ↓
+Learning Workspace
+  ↓
+Watch Video
+  ↓
+Track Progress
+  ↓
+Next Video (autoplay)
+  ↓
+Continue Learning
+```
+
+### Backend Integration
+
+**Currently connected:**
+- Playlist/video fetching (via playlist service)
+- Continue learning data (via learning service)
+
+**Future integration:**
+- Video progress persistence
+- Notes CRUD
+- Transcript fetching
+- AI Tutor chat
+
+### Responsive Design
+
+- **Desktop (lg+)**: Three-column layout (sidebar + player + info panel)
+- **Tablet (md)**: Two-column layout (sidebar + player, info panel hidden)
+- **Mobile (sm)**: Single column with collapsible sidebar
+
 ## Tech Stack
 
 | Technology | Purpose |
@@ -296,7 +595,8 @@ frontend/
 │   │   │   ├── ui/                  # shadcn/ui components
 │   │   │   ├── page-header.tsx      # Reusable page header
 │   │   │   ├── stat-card.tsx        # Dashboard stat card
-│   │   │   └── empty-state.tsx      # Empty state component
+│   │   │   ├── empty-state.tsx      # Empty state component
+│   │   │   └── card.tsx             # Card component
 │   │   ├── hooks/                   # Shared custom hooks
 │   │   ├── utils/                   # Utility functions (cn, etc.)
 │   │   ├── constants/               # Application constants
@@ -318,6 +618,13 @@ frontend/
 │   │   │   ├── pages/               # PlaylistsPage, PlaylistDetailPage, ImportPage
 │   │   │   ├── services/            # Playlist service (API functions)
 │   │   │   └── types/               # Playlist TypeScript types
+│   │   ├── learning/                # Learning workspace (Phase F4) ⭐ NEW
+│   │   │   ├── components/          # VideoPlayer, PlaylistSidebar, etc.
+│   │   │   ├── pages/               # WorkspacePage
+│   │   │   ├── hooks/               # useLearningWorkspace
+│   │   │   ├── services/            # Learning service (progress API)
+│   │   │   ├── types/               # Learning TypeScript types
+│   │   │   └── index.ts             # Public API exports
 │   │   ├── tutor/                   # AI Tutor (Phase F3, placeholder)
 │   │   ├── analytics/               # Analytics (Phase F3, placeholder)
 │   │   ├── progress/                # Progress (Phase F3, placeholder)
@@ -426,6 +733,7 @@ npm run preview
 | `/dashboard` | DashboardPage | ProtectedRoute | DashboardLayout | Partial | ✅ Complete |
 | `/dashboard/playlists` | PlaylistsPage | ProtectedRoute | DashboardLayout | Yes | ✅ Live |
 | `/dashboard/playlists/:id` | PlaylistDetailPage | ProtectedRoute | DashboardLayout | Yes | ✅ Live |
+| `/dashboard/workspace/:playlistId/:videoId` | WorkspacePage | ProtectedRoute | DashboardLayout | Partial | ✅ Complete |
 | `/dashboard/import` | ImportPage | ProtectedRoute | DashboardLayout | Yes | ✅ Live |
 | `/dashboard/tutor` | TutorPage | ProtectedRoute | DashboardLayout | No | ✅ Placeholder |
 | `/dashboard/analytics` | AnalyticsPage | ProtectedRoute | DashboardLayout | No | ✅ Placeholder |
@@ -465,14 +773,13 @@ All routes are lazy-loaded via `React.lazy()` for code splitting.
 
 ## Next Phase
 
-**Phase F4 — Playlist & Video Integration**
+**Phase F5 — Learning Intelligence**
 
-The next phase will enhance playlist and video features:
-- Playlist creation and editing
-- Video player with progress tracking
-- Video progress persistence
-- Playlist deletion and management
-- Enhanced playlist detail views
+The next phase will add AI-powered features:
+- Transcript pipeline and display
+- AI Tutor integration with RAG backend
+- Progress analytics with real data
+- Knowledge graph visualization
 
 ## License
 

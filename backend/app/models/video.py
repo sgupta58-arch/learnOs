@@ -8,7 +8,7 @@ in PlaylistImportService.
 import uuid
 from datetime import datetime
 
-from sqlalchemy import ForeignKey, String
+from sqlalchemy import DateTime, ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database.base import BaseModel
@@ -32,7 +32,7 @@ class Video(BaseModel):
     channel_name: Mapped[str | None] = mapped_column(String(255), nullable=True)
     duration_seconds: Mapped[int | None] = mapped_column(nullable=True)
     position: Mapped[int | None] = mapped_column(nullable=True, index=True)
-    published_at: Mapped[datetime | None] = mapped_column(nullable=True)
+    published_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
     playlist: Mapped["Playlist"] = relationship(
         "Playlist",

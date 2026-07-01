@@ -5,6 +5,7 @@ import { PageHeader } from '@/common/components/page-header';
 import { Card, CardContent } from '@/common/components/ui/card';
 import { Button } from '@/common/components/ui/button';
 import { ArrowLeft, Play, Clock, ListVideo, AlertCircle } from 'lucide-react';
+import { useMemo } from 'react';
 
 export function PlaylistDetailPage() {
   const { playlistId } = useParams<{ playlistId: string }>();
@@ -23,6 +24,12 @@ export function PlaylistDetailPage() {
 
   const playlist = playlistData?.data;
   const isLoading = playlistLoading || videosLoading;
+
+  // Get the first unwatched video for "Start Learning" button
+  const firstVideo = useMemo(() => {
+    if (!videos || videos.length === 0) return null;
+    return videos[0];
+  }, [videos]);
 
   if (isLoading) {
     return (
@@ -72,6 +79,31 @@ export function PlaylistDetailPage() {
         }
       />
 
+      {/* Start Learning CTA */}
+      {firstVideo && (
+        <Card className="mb-6 border-primary/20 bg-primary/5">
+          <CardContent className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h3 className="font-semibold">Ready to start learning?</h3>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Begin with "{firstVideo.title}"
+                {firstVideo.duration_seconds && (
+                  <span className="ml-2">
+                    ({Math.floor(firstVideo.duration_seconds / 60)}:{(firstVideo.duration_seconds % 60).toString().padStart(2, '0')})
+                  </span>
+                )}
+              </p>
+            </div>
+            <Link to={`/dashboard/workspace/${playlist.id}/${firstVideo.id}`}>
+              <Button size="lg" className="w-full sm:w-auto">
+                <Play className="mr-2 size-4" fill="currentColor" />
+                Start Learning
+              </Button>
+            </Link>
+          </CardContent>
+        </Card>
+      )}
+
       {videosError ? (
         <div className="flex flex-col items-center justify-center py-12">
           <AlertCircle className="mb-2 size-8 text-destructive" />
@@ -105,9 +137,11 @@ export function PlaylistDetailPage() {
                     {Math.floor(video.duration_seconds / 60)}:{(video.duration_seconds % 60).toString().padStart(2, '0')}
                   </div>
                 )}
-                <Button variant="ghost" size="icon" className="size-8">
-                  <Play className="size-4" />
-                </Button>
+                <Link to={`/dashboard/workspace/${playlist.id}/${video.id}`}>
+                  <Button variant="ghost" size="icon" className="size-8">
+                    <Play className="size-4" />
+                  </Button>
+                </Link>
               </CardContent>
             </Card>
           ))}
