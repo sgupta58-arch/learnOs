@@ -1,3 +1,4 @@
+from app.schemas.auth import LoginRequestSchema, TokenResponseSchema
 from app.schemas.common import ApiResponse, ErrorDetail, success_response, error_response
 from app.schemas.user import (
 	UserCreateSchema,
@@ -21,6 +22,8 @@ from app.schemas.progress import (
 
 __all__ = [
 	"ApiResponse",
+	"LoginRequestSchema",
+	"TokenResponseSchema",
 	"ErrorDetail",
 	"success_response",
 	"error_response",

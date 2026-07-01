@@ -14,8 +14,7 @@ Architecture:
 import uuid
 from datetime import datetime
 
-from sqlalchemy import ForeignKey, String, UniqueConstraint
-from sqlalchemy.dialects.postgresql import ENUM
+from sqlalchemy import Enum, ForeignKey, String, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database.base import BaseModel
@@ -45,7 +44,7 @@ class VideoProgress(BaseModel):
 
     # Progress Fields
     status: Mapped[VideoProgressStatus] = mapped_column(
-        ENUM(
+        Enum(
             VideoProgressStatus,
             name="videoprogressstatus",
             native_enum=False,

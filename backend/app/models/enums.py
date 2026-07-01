@@ -13,10 +13,10 @@ class PlaylistStatus(str, Enum):
     - PAUSED: Playlist is paused temporarily
     """
 
-    ACTIVE = "active"
-    COMPLETED = "completed"
-    ARCHIVED = "archived"
-    PAUSED = "paused"
+    ACTIVE = "ACTIVE"
+    COMPLETED = "COMPLETED"
+    ARCHIVED = "ARCHIVED"
+    PAUSED = "PAUSED"
 
 
 class SourceType(str, Enum):
@@ -30,11 +30,11 @@ class SourceType(str, Enum):
     - OTHER: Other content types
     """
 
-    YOUTUBE = "youtube"
-    PDF = "pdf"
-    DOCUMENTATION = "documentation"
-    BLOG = "blog"
-    OTHER = "other"
+    YOUTUBE = "YOUTUBE"
+    PDF = "PDF"
+    DOCUMENTATION = "DOCUMENTATION"
+    BLOG = "BLOG"
+    OTHER = "OTHER"
 
 
 class VideoProgressStatus(str, Enum):
@@ -46,6 +46,6 @@ class VideoProgressStatus(str, Enum):
     - COMPLETED: User has finished watching the video
     """
 
-    NOT_STARTED = "not_started"
-    IN_PROGRESS = "in_progress"
-    COMPLETED = "completed"
+    NOT_STARTED = "NOT_STARTED"
+    IN_PROGRESS = "IN_PROGRESS"
+    COMPLETED = "COMPLETED"

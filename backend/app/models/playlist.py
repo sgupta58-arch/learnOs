@@ -44,7 +44,7 @@ class Playlist(BaseModel):
 
     # Source Configuration
     source_type: Mapped[SourceType] = mapped_column(
-        ENUM(SourceType, name="sourcetype", native_enum=False),
+        ENUM(SourceType, name="sourcetype", create_type=False),
         nullable=False,
         default=SourceType.OTHER,
     )
@@ -53,7 +53,7 @@ class Playlist(BaseModel):
 
     # Status and Timeline
     status: Mapped[PlaylistStatus] = mapped_column(
-        ENUM(PlaylistStatus, name="playliststatus", native_enum=False),
+        ENUM(PlaylistStatus, name="playliststatus", create_type=False),
         nullable=False,
         default=PlaylistStatus.ACTIVE,
         index=True,
